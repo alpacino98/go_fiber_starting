@@ -2,7 +2,7 @@ package view
 
 import (
 	"github.com/alpacino98/go_fiber_starting/database"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/jinzhu/gorm"
 )
 
@@ -13,49 +13,48 @@ type View struct {
 	Rating int    `json:"rating"`
 }
 
-func GetViews(c *fiber.Ctx) {
+func GetViews(c *fiber.Ctx) error {
 	db := database.DBConn
 	var views []View
 	db.Find(&views)
-	c.JSON(views)
+	return c.JSON(views)
 	// c.Send("All views")
 }
 
-func GetView(c *fiber.Ctx) {
+func GetView(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DBConn
 	var view View
 	db.Find(&view, id)
-	c.JSON(view)
+	return c.JSON(view)
 }
 
-func NewView(c *fiber.Ctx) {
+func NewView(c *fiber.Ctx) error {
 	db := database.DBConn
 	view := new(View)
 
 	err := c.BodyParser(view)
 	if err != nil {
-		c.Status(500).Send(err)
+		return c.Status(500).SendString("Invalid body")
 	}
 
 	// view.Title = "1984"
 	// view.Author = "Alpha"
 	// view.Rating = 15
 	db.Create(&view)
-	c.JSON(view)
+	return c.JSON(view)
 }
 
-func DeleteView(c *fiber.Ctx) {
+func DeleteView(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DBConn
 	var view View
 
 	db.First(&view, id)
 	if view.Title == "" {
-		c.Status(500).Send("View not found.")
-		return
+		return c.Status(500).SendString("View not found.")
 	}
 
 	db.Delete(&view)
-	c.Send("Deleted view successfuly.")
+	return c.SendString("Deleted view successfuly.")
 }

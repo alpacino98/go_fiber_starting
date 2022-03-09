@@ -6,6 +6,7 @@ import (
 	"github.com/alpacino98/go_fiber_starting/database"
 	"github.com/alpacino98/go_fiber_starting/view"
 	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
@@ -34,6 +35,8 @@ func main() {
 	app := fiber.New()
 	initDatabase()
 	defer database.DBConn.Close()
+
+	app.Use(cors.New())
 
 	setupRoutes(app)
 
